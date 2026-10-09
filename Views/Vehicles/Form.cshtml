@@ -1,0 +1,23 @@
+@model VehicleRequest
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Add vehicle" : "Edit vehicle";
+}
+
+<h2 class="mb-3">@ViewData["Title"]</h2>
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : Model.Id)" method="post" class="bg-white p-4 rounded shadow-sm" style="max-width: 640px;">
+    <input type="hidden" asp-for="CustomerId" />
+    <div class="row">
+        <div class="col-md-6 mb-3"><label asp-for="RegistrationNumber" class="form-label"></label><input asp-for="RegistrationNumber" class="form-control" /><span asp-validation-for="RegistrationNumber" class="text-danger small"></span></div>
+        <div class="col-md-6 mb-3"><label asp-for="Year" class="form-label"></label><input asp-for="Year" type="number" class="form-control" /><span asp-validation-for="Year" class="text-danger small"></span></div>
+        <div class="col-md-6 mb-3"><label asp-for="Make" class="form-label"></label><input asp-for="Make" class="form-control" /><span asp-validation-for="Make" class="text-danger small"></span></div>
+        <div class="col-md-6 mb-3"><label asp-for="Model" class="form-label"></label><input asp-for="Model" class="form-control" /><span asp-validation-for="Model" class="text-danger small"></span></div>
+        <div class="col-md-4 mb-3"><label asp-for="Mileage" class="form-label">Mileage (km)</label><input asp-for="Mileage" type="number" min="0" class="form-control" /><span asp-validation-for="Mileage" class="text-danger small"></span></div>
+        <div class="col-md-4 mb-3"><label asp-for="ServiceIntervalKm" class="form-label">Service every (km)</label><input asp-for="ServiceIntervalKm" type="number" class="form-control" /><span asp-validation-for="ServiceIntervalKm" class="text-danger small"></span></div>
+        <div class="col-md-4 mb-3"><label asp-for="ServiceIntervalMonths" class="form-label">Service every (months)</label><input asp-for="ServiceIntervalMonths" type="number" class="form-control" /><span asp-validation-for="ServiceIntervalMonths" class="text-danger small"></span></div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-link">Back</a>
+</form>

@@ -1,0 +1,61 @@
+@model VehicleHistoryDto
+@{
+    ViewData["Title"] = $"History - {Model.RegistrationNumber}";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2>@Model.RegistrationNumber</h2>
+        <div class="text-muted">@Model.VehicleName · @Model.CurrentMileage.ToString("N0") km</div>
+    </div>
+    <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-outline-secondary btn-sm">Customer</a>
+</div>
+
+@if (Model.IsDueSoon)
+{
+    <div class="alert alert-warning">Service due soon: next at @Model.NextServiceMileage.ToString("N0") km or by @Model.NextServiceDate.ToString("dd MMM yyyy").</div>
+}
+else
+{
+    <div class="alert alert-info">Next service: @Model.NextServiceMileage.ToString("N0") km or by @Model.NextServiceDate.ToString("dd MMM yyyy") (every @Model.ServiceIntervalKm.ToString("N0") km / @Model.ServiceIntervalMonths months).</div>
+}
+
+<div class="bg-white p-3 rounded shadow-sm mb-4">
+    <canvas id="mileageChart" height="90"></canvas>
+</div>
+
+<table class="table bg-white shadow-sm align-middle">
+    <thead class="table-light"><tr><th>Date</th><th class="text-end">Odometer</th><th>Service</th><th>Parts</th><th>Technician</th><th class="text-end">Total</th></tr></thead>
+    <tbody>
+    @foreach (var e in Model.Entries.OrderByDescending(x => x.ServiceDate))
+    {
+        <tr>
+            <td>@e.ServiceDate.ToString("dd MMM yyyy")</td>
+            <td class="text-end">@e.Mileage.ToString("N0")</td>
+            <td>@e.Description</td>
+            <td class="small">@e.PartsUsed</td>
+            <td>@e.Technician</td>
+            <td class="text-end">@e.Total.ToString("N2")</td>
+        </tr>
+    }
+    @if (!Model.Entries.Any())
+    {
+        <tr><td colspan="6" class="text-center text-muted">No services recorded yet.</td></tr>
+    }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const ordered = @Json.Serialize(Model.Entries.OrderBy(x => x.ServiceDate).Select(x => new { date = x.ServiceDate.ToString("dd MMM yy"), km = x.Mileage }));
+        new Chart(document.getElementById('mileageChart'), {
+            type: 'line',
+            data: {
+                labels: ordered.map(p => p.date),
+                datasets: [{ label: 'Odometer (km)', data: ordered.map(p => p.km), tension: 0.3, fill: false }]
+            },
+            options: { plugins: { legend: { display: true } } }
+        });
+    </script>
+}

@@ -1,0 +1,38 @@
+@model IReadOnlyList<InvoiceListItemDto>
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+<h2 class="mb-3">Invoices</h2>
+
+<div class="btn-group mb-3">
+    <a class="btn btn-outline-secondary @(ViewBag.Status == null ? "active" : "")" asp-action="Index">All</a>
+    <a class="btn btn-outline-secondary" asp-action="Index" asp-route-status="Unpaid">Unpaid</a>
+    <a class="btn btn-outline-secondary" asp-action="Index" asp-route-status="PartiallyPaid">Partly paid</a>
+    <a class="btn btn-outline-secondary" asp-action="Index" asp-route-status="Paid">Paid</a>
+</div>
+
+<table class="table table-hover bg-white shadow-sm align-middle">
+    <thead class="table-dark"><tr><th>#</th><th>Customer</th><th>Vehicle</th><th class="text-end">Total</th><th class="text-end">Balance</th><th>Due</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var i in Model)
+    {
+        <tr>
+            <td><a asp-action="Details" asp-route-id="@i.Id">#@i.Id.ToString("D6")</a></td>
+            <td>@i.CustomerName</td>
+            <td>@i.VehicleRegistration</td>
+            <td class="text-end">@i.Total.ToString("N2")</td>
+            <td class="text-end">@i.Balance.ToString("N2")</td>
+            <td class="@(i.IsOverdue ? "text-danger fw-semibold" : "")">@i.DueDate.ToString("dd MMM yyyy")</td>
+            <td>
+                @if (i.IsOverdue) { <span class="badge text-bg-danger">Overdue</span> }
+                else { <span class="badge text-bg-secondary">@i.Status</span> }
+            </td>
+        </tr>
+    }
+    @if (!Model.Any())
+    {
+        <tr><td colspan="7" class="text-center text-muted py-4">No invoices.</td></tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,16 @@
+@model DashboardSummary
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row g-3">
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Revenue collected</small><h4>@Model.RevenueCollected.ToString("C")</h4></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Outstanding balance</small><h4>@Model.OutstandingBalance.ToString("C")</h4></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Overdue invoices</small><h4 class="@(Model.OverdueInvoices > 0 ? "text-danger" : "")">@Model.OverdueInvoices</h4></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Bookings today</small><h4>@Model.BookingsToday</h4></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Vehicles in workshop</small><h4>@Model.VehiclesInWorkshop</h4></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Customers</small><h4>@Model.TotalCustomers</h4></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><small class="text-muted">Parts at reorder level</small><h4 class="@(Model.LowStockParts > 0 ? "text-warning" : "")">@Model.LowStockParts</h4><a asp-controller="Inventory" asp-action="Index" asp-route-lowStock="true">View</a></div></div></div>
+</div>

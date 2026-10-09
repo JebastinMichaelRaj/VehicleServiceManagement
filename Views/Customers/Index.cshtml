@@ -1,0 +1,50 @@
+@model PagedResult<CustomerListItemDto>
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Customers</h2>
+    <a class="btn btn-primary" asp-action="Create">New customer</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input type="search" name="q" value="@ViewBag.Query" class="form-control" placeholder="Search by name, email, phone or registration" />
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-secondary" type="submit">Search</button></div>
+</form>
+
+<table class="table table-hover bg-white shadow-sm align-middle">
+    <thead class="table-dark"><tr><th>Name</th><th>Email</th><th>Phone</th><th>State</th><th class="text-center">Vehicles</th></tr></thead>
+    <tbody>
+    @foreach (var c in Model.Items)
+    {
+        <tr>
+            <td><a asp-action="Details" asp-route-id="@c.Id">@c.FullName</a></td>
+            <td>@c.Email</td>
+            <td>@c.Phone</td>
+            <td>@c.State</td>
+            <td class="text-center">@c.VehicleCount</td>
+        </tr>
+    }
+    @if (!Model.Items.Any())
+    {
+        <tr><td colspan="5" class="text-center text-muted py-4">No customers match your search.</td></tr>
+    }
+    </tbody>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @for (var p = 1; p <= Model.TotalPages; p++)
+            {
+                <li class="page-item @(p == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-q="@ViewBag.Query" asp-route-page="@p">@p</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

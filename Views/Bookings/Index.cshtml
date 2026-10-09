@@ -1,0 +1,42 @@
+@model IReadOnlyList<BookingListItemDto>
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Upcoming appointments</h2>
+    <a class="btn btn-primary" asp-action="Create">New booking</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-hover bg-white shadow-sm align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Start</th><th>Vehicle</th><th>Customer</th><th>Service</th><th>Technician</th><th>Status</th><th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ScheduledStart.ToString("ddd dd MMM, HH:mm")</td>
+            <td>@item.VehicleRegistration</td>
+            <td>@item.CustomerName</td>
+            <td>@item.ServiceName</td>
+            <td>@item.TechnicianName</td>
+            <td><span class="badge text-bg-secondary">@item.Status</span></td>
+            <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-success" asp-action="Complete" asp-route-id="@item.Id">Complete</a>
+                <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Cancel</button>
+                </form>
+            </td>
+        </tr>
+    }
+    @if (!Model.Any())
+    {
+        <tr><td colspan="7" class="text-center text-muted py-4">No upcoming appointments.</td></tr>
+    }
+    </tbody>
+</table>
+</div>

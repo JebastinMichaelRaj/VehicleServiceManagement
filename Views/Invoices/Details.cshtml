@@ -1,0 +1,89 @@
+@model InvoiceDetailsDto
+@{
+    ViewData["Title"] = $"Invoice #{Model.Id:D6}";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2>Invoice #@Model.Id.ToString("D6")</h2>
+        <div class="text-muted">@Model.CustomerName · @Model.VehicleRegistration · due @Model.DueDate.ToString("dd MMM yyyy")</div>
+    </div>
+    <a asp-action="Pdf" asp-route-id="@Model.Id" class="btn btn-outline-dark btn-sm">Download PDF</a>
+</div>
+
+@if (Model.IsOverdue)
+{
+    <div class="alert alert-danger">This invoice is overdue. Balance: @Model.Balance.ToString("N2")</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <table class="table bg-white shadow-sm">
+            <thead class="table-light"><tr><th>Item</th><th class="text-end">Qty</th><th class="text-end">Rate</th><th class="text-end">Amount</th></tr></thead>
+            <tbody>
+            @foreach (var l in Model.Lines)
+            {
+                <tr><td>@l.Description</td><td class="text-end">@l.Quantity</td><td class="text-end">@l.UnitPrice.ToString("N2")</td><td class="text-end">@l.Amount.ToString("N2")</td></tr>
+            }
+            </tbody>
+        </table>
+
+        <table class="table bg-white shadow-sm">
+            <tbody>
+                <tr><td>Subtotal</td><td class="text-end">@Model.Subtotal.ToString("N2")</td></tr>
+                @if (Model.DiscountAmount > 0)
+                {
+                    <tr><td>Discount (@Model.DiscountPercent%)</td><td class="text-end">-@Model.DiscountAmount.ToString("N2")</td></tr>
+                }
+                @if (Model.IgstAmount > 0)
+                {
+                    <tr><td>IGST (@((Model.TaxRate * 100).ToString("0.##"))%)</td><td class="text-end">@Model.IgstAmount.ToString("N2")</td></tr>
+                }
+                else
+                {
+                    <tr><td>CGST (@((Model.TaxRate / 2 * 100).ToString("0.##"))%)</td><td class="text-end">@Model.CgstAmount.ToString("N2")</td></tr>
+                    <tr><td>SGST (@((Model.TaxRate / 2 * 100).ToString("0.##"))%)</td><td class="text-end">@Model.SgstAmount.ToString("N2")</td></tr>
+                }
+                <tr class="fw-bold"><td>Total</td><td class="text-end">@Model.Total.ToString("N2")</td></tr>
+                <tr><td>Paid</td><td class="text-end">@Model.AmountPaid.ToString("N2")</td></tr>
+                <tr class="fw-bold"><td>Balance</td><td class="text-end">@Model.Balance.ToString("N2")</td></tr>
+            </tbody>
+        </table>
+
+        <h6 class="mt-4">Payments</h6>
+        <ul class="list-group">
+            @foreach (var p in Model.Payments)
+            {
+                <li class="list-group-item d-flex justify-content-between">@p.PaidOn.ToString("dd MMM yyyy") · @p.Method<span>@p.Amount.ToString("N2")</span></li>
+            }
+            @if (!Model.Payments.Any())
+            {
+                <li class="list-group-item text-muted">No payments yet.</li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-lg-5">
+        @if (Model.Balance > 0)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>Record payment</h6>
+                    <form asp-action="Pay" asp-route-id="@Model.Id" method="post">
+                        <div class="mb-2"><label class="form-label">Amount</label><input name="Amount" type="number" step="0.01" min="0.01" max="@Model.Balance" value="@Model.Balance.ToString("0.00")" class="form-control" required /></div>
+                        <div class="mb-3">
+                            <label class="form-label">Method</label>
+                            <select name="Method" class="form-select">
+                                <option value="Cash">Cash</option>
+                                <option value="Card">Card</option>
+                                <option value="BankTransfer">Bank transfer</option>
+                                <option value="Upi">UPI</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success w-100" type="submit">Record payment</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

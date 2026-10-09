@@ -1,0 +1,41 @@
+@model CreateBookingRequest
+@{
+    ViewData["Title"] = "New Booking";
+}
+
+<h2 class="mb-3">Schedule a service</h2>
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+<form asp-action="Create" method="post" class="bg-white p-4 rounded shadow-sm" style="max-width: 640px;">
+    <div class="mb-3">
+        <label asp-for="VehicleId" class="form-label">Vehicle</label>
+        <select asp-for="VehicleId" asp-items="ViewBag.Vehicles" class="form-select"></select>
+        <span asp-validation-for="VehicleId" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ServiceId" class="form-label">Service</label>
+        <select asp-for="ServiceId" asp-items="ViewBag.Services" class="form-select"></select>
+        <span asp-validation-for="ServiceId" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ScheduledStart" class="form-label">Start date &amp; time</label>
+        <input asp-for="ScheduledStart" type="datetime-local" class="form-control" />
+        <span asp-validation-for="ScheduledStart" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="TechnicianName" class="form-label">Technician</label>
+        <input asp-for="TechnicianName" class="form-control" />
+        <span asp-validation-for="TechnicianName" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label">Notes</label>
+        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Schedule</button>
+    <a asp-action="Index" class="btn btn-link">Back to bookings</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

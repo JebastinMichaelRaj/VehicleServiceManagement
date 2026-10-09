@@ -1,0 +1,65 @@
+@model CustomerDetailsDto
+@{
+    ViewData["Title"] = Model.FullName;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2>@Model.FullName</h2>
+        <div class="text-muted">@Model.Email · @Model.Phone · @Model.State</div>
+    </div>
+    <div class="text-nowrap">
+        <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-primary btn-sm" asp-controller="Vehicles" asp-action="Create" asp-route-customerId="@Model.Id">Add vehicle</a>
+    </div>
+</div>
+
+<h5>Vehicles</h5>
+<table class="table bg-white shadow-sm align-middle">
+    <thead class="table-light"><tr><th>Registration</th><th>Vehicle</th><th class="text-end">Mileage</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var v in Model.Vehicles)
+    {
+        <tr>
+            <td>@v.RegistrationNumber</td>
+            <td>@v.Year @v.Make @v.Model</td>
+            <td class="text-end">@v.Mileage.ToString("N0") km</td>
+            <td class="text-end text-nowrap">
+                <a asp-controller="Vehicles" asp-action="History" asp-route-id="@v.Id">History</a> ·
+                <a asp-controller="Vehicles" asp-action="Edit" asp-route-id="@v.Id">Edit</a>
+            </td>
+        </tr>
+    }
+    @if (!Model.Vehicles.Any())
+    {
+        <tr><td colspan="4" class="text-center text-muted">No vehicles yet.</td></tr>
+    }
+    </tbody>
+</table>
+
+<h5 class="mt-4">Service history</h5>
+<table class="table bg-white shadow-sm align-middle">
+    <thead class="table-light"><tr><th>Date</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var h in Model.ServiceHistory)
+    {
+        <tr>
+            <td>@h.ScheduledStart.ToString("dd MMM yyyy, HH:mm")</td>
+            <td>@h.VehicleRegistration</td>
+            <td>@h.ServiceName</td>
+            <td><span class="badge text-bg-secondary">@h.Status</span></td>
+        </tr>
+    }
+    @if (!Model.ServiceHistory.Any())
+    {
+        <tr><td colspan="4" class="text-center text-muted">No services recorded.</td></tr>
+    }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Admin"))
+{
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Delete this customer?');">
+        <button class="btn btn-outline-danger btn-sm">Delete customer</button>
+    </form>
+}

@@ -1,0 +1,41 @@
+@model IReadOnlyList<PartListItemDto>
+@{
+    ViewData["Title"] = "Parts";
+    var lowOnly = (bool)(ViewBag.LowStock ?? false);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Parts &amp; stock</h2>
+    <div>
+        <a asp-action="Index" asp-route-lowStock="@(!lowOnly)" class="btn btn-outline-warning me-2">@(lowOnly ? "Show all" : "Reorder alerts only")</a>
+        <a asp-action="Create" class="btn btn-primary">New part</a>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="lowStock" value="@lowOnly.ToString().ToLowerInvariant()" />
+    <div class="col-md-6"><input type="search" name="q" value="@ViewBag.Query" class="form-control" placeholder="Search by name or SKU" /></div>
+    <div class="col-auto"><button class="btn btn-outline-secondary" type="submit">Search</button></div>
+</form>
+
+<table class="table bg-white shadow-sm align-middle">
+    <thead class="table-dark"><tr><th>SKU</th><th>Name</th><th class="text-end">Price</th><th class="text-end">On hand</th><th class="text-end">Reorder at</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr class="@(p.IsLowStock ? "table-warning" : "")">
+            <td>@p.Sku</td>
+            <td>@p.Name</td>
+            <td class="text-end">@p.UnitPrice.ToString("N2")</td>
+            <td class="text-end">@p.QuantityOnHand</td>
+            <td class="text-end">@p.ReorderLevel</td>
+            <td>@if (p.IsLowStock) { <span class="badge text-bg-warning">Reorder</span> } else { <span class="badge text-bg-success">OK</span> }</td>
+            <td class="text-end"><a asp-action="Edit" asp-route-id="@p.Id">Edit</a></td>
+        </tr>
+    }
+    @if (!Model.Any())
+    {
+        <tr><td colspan="7" class="text-center text-muted">No parts found.</td></tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,57 @@
+@model VehicleServiceManagement.Services.Customers.CustomerDetailsDto
+@{
+    ViewData["Title"] = "My services";
+    var invoices = (IReadOnlyList<VehicleServiceManagement.Services.Invoicing.InvoiceListItemDto>)ViewBag.Invoices;
+}
+
+<h2 class="mb-1">Welcome, @Model.FullName</h2>
+<p class="text-muted">Your vehicles, services and invoices.</p>
+
+<h5 class="mt-4">Your vehicles</h5>
+<ul class="list-group mb-4">
+    @foreach (var v in Model.Vehicles)
+    {
+        <li class="list-group-item">@v.RegistrationNumber — @v.Year @v.Make @v.Model (@v.Mileage.ToString("N0") km)</li>
+    }
+    @if (!Model.Vehicles.Any())
+    {
+        <li class="list-group-item text-muted">No vehicles on your account yet.</li>
+    }
+</ul>
+
+<h5>Service history</h5>
+<table class="table bg-white shadow-sm">
+    <thead class="table-light"><tr><th>Date</th><th>Vehicle</th><th>Service</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var h in Model.ServiceHistory)
+    {
+        <tr><td>@h.ScheduledStart.ToString("dd MMM yyyy")</td><td>@h.VehicleRegistration</td><td>@h.ServiceName</td><td>@h.Status</td></tr>
+    }
+    @if (!Model.ServiceHistory.Any())
+    {
+        <tr><td colspan="4" class="text-center text-muted">No services yet.</td></tr>
+    }
+    </tbody>
+</table>
+
+<h5 class="mt-4">Invoices</h5>
+<table class="table bg-white shadow-sm">
+    <thead class="table-light"><tr><th>#</th><th>Vehicle</th><th class="text-end">Total</th><th class="text-end">Balance</th><th>Due</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var i in invoices)
+    {
+        <tr>
+            <td>#@i.Id.ToString("D6")</td>
+            <td>@i.VehicleRegistration</td>
+            <td class="text-end">@i.Total.ToString("N2")</td>
+            <td class="text-end">@i.Balance.ToString("N2")</td>
+            <td class="@(i.IsOverdue ? "text-danger" : "")">@i.DueDate.ToString("dd MMM yyyy")</td>
+            <td class="text-end"><a asp-action="InvoicePdf" asp-route-id="@i.Id">PDF</a></td>
+        </tr>
+    }
+    @if (!invoices.Any())
+    {
+        <tr><td colspan="6" class="text-center text-muted">No invoices yet.</td></tr>
+    }
+    </tbody>
+</table>
